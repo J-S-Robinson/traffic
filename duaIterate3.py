@@ -471,7 +471,7 @@ def runDuaIterate(netfile,routefile,iters,statefile=None,
 
 #    logfile = open("data\\stdout.log", "w+")
 #    sys.stdout = sumolib.TeeFile(sys.stdout, logfile)
-    log = open("data\dua_iter_out\dua.log", "w+")
+    log = open("oneway_data\\dua.log", "w+")
 
     starttime = datetime.now()
     if options.trips:

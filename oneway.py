@@ -10,22 +10,24 @@ from utils.traffic import Vehicle, VehicleType, Route, Demand
 import numpy.random as random
 import os
 
-import duaIterate3
+from DUAGawron import runDUAGawron
+
+#import duaIterate3
 
 nodes = [Node('0', 0, 0),
         Node('1', 0, 100),
         Node('2', -50, 150),
         Node('3', 50, 150),
-        Node('4', -50, 200),
-        Node('5', 50, 200),
-        Node('6', 0, 250),
-        Node('7', 0, 300)]
+        Node('4', -50, 300),
+        Node('5', 50, 300),
+        Node('6', 0, 350),
+        Node('7', 0, 400)]
         
 edges = [Edge(nodes[0],nodes[1]),
          Edge(nodes[1],nodes[2]),
          Edge(nodes[1],nodes[3]),
          Edge(nodes[2],nodes[4],speed=5),
-         Edge(nodes[3],nodes[5],speed=5),
+         Edge(nodes[3],nodes[5],speed=2.5),
          Edge(nodes[4],nodes[6]),
          Edge(nodes[5],nodes[6]),
          Edge(nodes[6],nodes[7])]
@@ -57,24 +59,29 @@ dem = Demand(vehTypes,vehicles)
 
 dem.genRouteFile('oneway_data\\oneway.rou.xml')
 
-import subprocess
-p = subprocess.Popen(['%s\\sumo-gui.exe' % sumo_path,
-                  '-n', 'oneway_data\\oneway.net.xml',
-                  '-r', 'oneway_data\\oneway.rou.xml',
-                  '--save-configuration', 'oneway.sumocfg'])
-
-p = subprocess.Popen(['%s\\sumo.exe' % sumo_path,
-                  '-n', 'oneway_data\\oneway.net.xml',
-                  '-r', 'oneway_data\\oneway.rou.xml',
-                  '--save-state.prefix', 'oneway_data\\oneway.state',
-                  '--save-state.suffix', '.xml',
-                  '--save-state.period', '1000'])
+#import subprocess
+#p = subprocess.Popen(['%s\\sumo-gui.exe' % sumo_path,
+#                  '-n', 'oneway_data\\oneway.net.xml',
+#                  '-r', 'oneway_data\\oneway.rou.xml',
+#                  '--save-configuration', 'oneway.sumocfg'])
+#
+#p = subprocess.Popen(['%s\\sumo.exe' % sumo_path,
+#                  '-n', 'oneway_data\\oneway.net.xml',
+#                  '-r', 'oneway_data\\oneway.rou.xml',
+#                  '--save-state.prefix', 'oneway_data\\oneway.state',
+#                  '--save-state.suffix', '.xml',
+#                  '--save-state.period', '1000'])
 
 
 numiters = 10
 print(dumbcars)
-duaIterate3.runDuaIterate('oneway_data\\oneway.net.xml',
-                          'oneway_data\\oneway.rou.xml',numiters,
-                          statefile='oneway_data\\oneway.state_0.00.xml',
-                          start_time='0',dumb_cars=dumbcars)
+
+runDUAGawron(sumo_path + '\\sumo.exe', sumo_path + '\\duarouter.exe', 'oneway_data\\oneway.net.xml', 'oneway_data\\oneway.rou.xml',
+                 numIters=200,folder='DUA_data')
+
+
+#duaIterate3.runDuaIterate('oneway_data\\oneway.net.xml',
+#                          'oneway_data\\oneway.rou.xml',numiters,
+#                          statefile='oneway_data\\oneway.state_0.00.xml',
+#                          start_time='0',dumb_cars=dumbcars)
 
