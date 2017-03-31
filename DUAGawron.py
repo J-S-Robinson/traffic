@@ -27,6 +27,10 @@ def runSUMO(sumoBinary, step, netFile, routeFile, outputFolder, outputFile,
     aggregation = 900
     
     addFile = outputFolder + '\\outputDef.add.xml'
+<<<<<<< HEAD
+    tripOut = outputFolder + '\\tripInfo.xml'
+=======
+>>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
     
     with open(addFile, 'w') as fd:
         print('<a>', file=fd)
@@ -39,6 +43,10 @@ def runSUMO(sumoBinary, step, netFile, routeFile, outputFolder, outputFile,
                '--net-file', netFile,
                '--route-files',routeFile,
                '--additional-files', addFile,
+<<<<<<< HEAD
+               '--tripinfo-output', tripOut,
+=======
+>>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
                '--seed', '%s' % step,
                '--no-step-log',
                '--verbose',

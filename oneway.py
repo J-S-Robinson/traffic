@@ -33,7 +33,11 @@ edges = [Edge(nodes[0],nodes[1]),
          Edge(nodes[6],nodes[7])]
          
 newNet = Network(nodes,edges)
+<<<<<<< HEAD
+sumo_path = 'C:\\Program Files (x86)\\DLR\\Sumo\\bin'
+=======
 sumo_path = 'C:\\dev\\Traffic\\Sumo\\bin'
+>>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
 os.makedirs('oneway_data',exist_ok=True)
 newNet.writeNet(sumo_path,'oneway_data\\oneway')
 
@@ -77,7 +81,11 @@ numiters = 10
 print(dumbcars)
 
 runDUAGawron(sumo_path + '\\sumo.exe', sumo_path + '\\duarouter.exe', 'oneway_data\\oneway.net.xml', 'oneway_data\\oneway.rou.xml',
+<<<<<<< HEAD
+                 numIters=15,folder='DUA_data')
+=======
                  numIters=200,folder='DUA_data')
+>>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
 
 
 #duaIterate3.runDuaIterate('oneway_data\\oneway.net.xml',
