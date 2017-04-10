@@ -14,30 +14,28 @@ from DUAGawron import runDUAGawron
 
 #import duaIterate3
 
-nodes = [Node('0', 0, 0),
+nodes = [Node('0', 0, -1000),
         Node('1', 0, 100),
         Node('2', -50, 150),
         Node('3', 50, 150),
-        Node('4', -50, 300),
-        Node('5', 50, 300),
-        Node('6', 0, 350),
-        Node('7', 0, 400)]
+        Node('4', -50, 175),
+        Node('5', 50, 175),
+        Node('6', 0, 225),
+        Node('7', 0, 250)]
         
 edges = [Edge(nodes[0],nodes[1]),
          Edge(nodes[1],nodes[2]),
          Edge(nodes[1],nodes[3]),
          Edge(nodes[2],nodes[4],speed=5),
-         Edge(nodes[3],nodes[5],speed=2.5),
+         Edge(nodes[3],nodes[5],speed=2),
          Edge(nodes[4],nodes[6]),
          Edge(nodes[5],nodes[6]),
-         Edge(nodes[6],nodes[7])]
+         Edge(nodes[6],nodes[7],numLanes=2)]
          
 newNet = Network(nodes,edges)
-<<<<<<< HEAD
-sumo_path = 'C:\\Program Files (x86)\\DLR\\Sumo\\bin'
-=======
+
 sumo_path = 'C:\\dev\\Traffic\\Sumo\\bin'
->>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
+
 os.makedirs('oneway_data',exist_ok=True)
 newNet.writeNet(sumo_path,'oneway_data\\oneway')
 
@@ -63,33 +61,8 @@ dem = Demand(vehTypes,vehicles)
 
 dem.genRouteFile('oneway_data\\oneway.rou.xml')
 
-#import subprocess
-#p = subprocess.Popen(['%s\\sumo-gui.exe' % sumo_path,
-#                  '-n', 'oneway_data\\oneway.net.xml',
-#                  '-r', 'oneway_data\\oneway.rou.xml',
-#                  '--save-configuration', 'oneway.sumocfg'])
-#
-#p = subprocess.Popen(['%s\\sumo.exe' % sumo_path,
-#                  '-n', 'oneway_data\\oneway.net.xml',
-#                  '-r', 'oneway_data\\oneway.rou.xml',
-#                  '--save-state.prefix', 'oneway_data\\oneway.state',
-#                  '--save-state.suffix', '.xml',
-#                  '--save-state.period', '1000'])
-
-
 numiters = 10
 print(dumbcars)
 
 runDUAGawron(sumo_path + '\\sumo.exe', sumo_path + '\\duarouter.exe', 'oneway_data\\oneway.net.xml', 'oneway_data\\oneway.rou.xml',
-<<<<<<< HEAD
                  numIters=15,folder='DUA_data')
-=======
-                 numIters=200,folder='DUA_data')
->>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
-
-
-#duaIterate3.runDuaIterate('oneway_data\\oneway.net.xml',
-#                          'oneway_data\\oneway.rou.xml',numiters,
-#                          statefile='oneway_data\\oneway.state_0.00.xml',
-#                          start_time='0',dumb_cars=dumbcars)
-

@@ -4,7 +4,7 @@ Created on Mon Mar 20 15:04:31 2017
 
 @author: Harvey
 """
-import os
+import os, shutil
 #==============================================================================
 # This code implements a variant of Gawron's method of Dynamic User Assignment
 # for cases where only a subset of the vehicles can be routed. Additionally it
@@ -17,7 +17,8 @@ def runDUAIteratepartial():
     pass
 
 def runSUMO(sumoBinary, step, netFile, routeFile, outputFolder, outputFile,
-            loadState = False, stateFile = '', begin=0):
+            loadState = False, stateFile = '', begin=0, tripOut=None,
+            saveConfig = False):
     # First Generate Configuration for SUMO
     
     # Create Output File Definition
@@ -27,10 +28,7 @@ def runSUMO(sumoBinary, step, netFile, routeFile, outputFolder, outputFile,
     aggregation = 900
     
     addFile = outputFolder + '\\outputDef.add.xml'
-<<<<<<< HEAD
-    tripOut = outputFolder + '\\tripInfo.xml'
-=======
->>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
+
     
     with open(addFile, 'w') as fd:
         print('<a>', file=fd)
@@ -43,21 +41,23 @@ def runSUMO(sumoBinary, step, netFile, routeFile, outputFolder, outputFile,
                '--net-file', netFile,
                '--route-files',routeFile,
                '--additional-files', addFile,
-<<<<<<< HEAD
-               '--tripinfo-output', tripOut,
-=======
->>>>>>> 6b574bea9fadbe8bd63ab56cf2105c97c0b93710
                '--seed', '%s' % step,
                '--no-step-log',
                '--verbose',
                '--begin','%s' % begin]
     if loadState:
        sumoCmd += ['--load-state', stateFile]
+       
+    if tripOut != None:
+        sumoCmd += ['--tripinfo-output', tripOut]
     
     # make sure all arguments are strings
     sumoCmd = list(map(str, sumoCmd))
     # use sumoBinary to write a config file
 #    subprocess.call(sumoCmd, stdout=subprocess.PIPE)
+    if  saveConfig:
+        pp = subprocess.Popen(sumoCmd + ['--save-configuration','lastrun.sumocfg'])
+        pp.wait()
     p = subprocess.Popen(sumoCmd, stdout=subprocess.PIPE)
     p.wait()
     print(p.stdout.read().decode())
@@ -69,8 +69,8 @@ def runDUARouter(duarouterBinary, step, netFile, inputFile, outputFile,
                  '--net-file', netFile,
                  '--output-file', outputFile,
                  '--verbose', 'true',
-                 '--gawron.a', '2.0',
-                 '--gawron.beta', '0.05',
+                 '--gawron.a', '.5',
+                 '--gawron.beta', '0.1',
                  '--max-alternatives', '5',
                  '--weights.expand', 'true',
                  '--seed', '%s' % step,
@@ -99,12 +99,25 @@ def runDUAGawron(sumoBin, DUABin, netfile, routefile,
         if i == 0:
             runDUARouter(DUABin, i, netfile, routefile, folder+'\\tmp.rou.xml')
         else:
-            runDUARouter(DUABin, i, netfile, routefile, folder+'\\tmp.rou.xml',
+            shutil.copyfile(folder+'\\tmp.rou.alt.xml',folder + '\\old.rou.alt.xml')
+            runDUARouter(DUABin, i, netfile, folder+'\\old.rou.alt.xml', folder+'\\tmp.rou.xml',
                          folder + '\\edgeData.xml')
+#            runDUARouter(DUABin, i, netfile, routefile, folder+'\\tmp.rou.xml',
+#                         folder + '\\edgeData.xml')
         
         
         # SUMO also needs a route and network file as inputs it will output the
         # travel time on each edge, which will be used by the next iteration of
         # DUAITERATE
+        save = False
+        if i == 0 :
+            tripfile = folder + '\\initTripInfo.xml'
+        elif i == (numIters - 1):
+            tripfile = folder + '\\finalTripInfo.xml'
+            save = True
+        else:
+            tripfile = None
+            
+                    
         runSUMO(sumoBin, i, netfile, 'DUA_data\\tmp.rou.xml', folder,
-                'edgeData.xml')
+                'edgeData.xml',tripOut=tripfile,saveConfig = save)

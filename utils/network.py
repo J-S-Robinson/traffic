@@ -5,7 +5,7 @@ Created on Wed Jan 18 23:49:57 2017
 @author: Harvey
 """
 import xml.etree.ElementTree as ET
-from subprocess import Popen
+from subprocess import Popen,PIPE
 
 class Node: 
     
@@ -77,11 +77,13 @@ class Network:
         self._genNodeFile('%s.nod.xml' % nameroot)
         self._genEdgeFile('%s.edg.xml' % nameroot)
         self._genConNoUturn('%s.con.xml' % nameroot)
-        Popen(['%s\\netconvert.exe' % sumo_path,
+        p = Popen(['%s\\netconvert.exe' % sumo_path,
               '-n','%s.nod.xml' % nameroot,
               '-e','%s.edg.xml' % nameroot,
               '-x', '%s.con.xml' % nameroot,
-              '-o', '%s.net.xml' % nameroot])
+              '-o', '%s.net.xml' % nameroot],stdout=PIPE)
+        p.wait()
+        print(p.stdout.read().decode())
 
 
     
