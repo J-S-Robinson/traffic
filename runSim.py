@@ -5,7 +5,7 @@ Created on Thu Apr  6 14:51:48 2017
 @author: jrobinson47
 """
 
-import sys, subprocess
+import sys, subprocess, os
 
 with open("local\\sumo.path", 'r') as f:
     sumo_path = f.read()
@@ -40,6 +40,9 @@ def startTraciInstance(cfg,begin = None, state_opt = None):
     t = traci.connect(sim_globals['next_free_port'])
     sim_globals['next_free_port'] += 1
     return p, t
+
+
+    
     
 def genConfig(cfg,net,route,add_args = None):
     args = [sumo_path + '\\sumo.exe',
@@ -55,14 +58,23 @@ def genConfig(cfg,net,route,add_args = None):
     p.wait()
     print(p.stdout.read().decode())
     
-def runSim(net,route):
+def runSim(net,route,reroutes,fusion_arch=None):
     # requires definition of simulation net and route as well as fusion framework
     # frequency of rerouting
     
     # load truth model
+    f_dir = os.path.split(net)[0]
+    t_config = f_dir + '\\truth.sumocfg'
+    
+    fusion_arch.genDetectorFile(f_dir + '\\det.add.xml')
+    genConfig(t_config,net,route)
+    p_truth, truth = startTraciInstance(t_config)
     # load belief model (empty network)
     
     # propagate truth and belief
+    # while cars remain in the truth model
+    while truth.simulation.getMinExpectedNumber() > 0:
+        truth.simulationStep()
     
     # optional: create secondary tracks for dumb cars passing intersections
     
@@ -70,7 +82,7 @@ def runSim(net,route):
     # belief receives sensor reports from truth via sensor model
     # fusion rules applied
     # belief state update
-    pass
+    # if it's time for a reroute, do so.
 
 def compareStates(truth,belief):
     # compare state of belief to truth to acquire IQ metrics
