@@ -58,7 +58,7 @@ def genConfig(cfg,net,route,add_args = None):
     p.wait()
     print(p.stdout.read().decode())
     
-def runSim(net,route,reroutes,fusion_arch=None):
+def runSim(net,route,reroutes,fusion=None):
     # requires definition of simulation net and route as well as fusion framework
     # frequency of rerouting
     
@@ -66,7 +66,7 @@ def runSim(net,route,reroutes,fusion_arch=None):
     f_dir = os.path.split(net)[0]
     t_config = f_dir + '\\truth.sumocfg'
     
-    fusion_arch.genDetectorFile(f_dir + '\\det.add.xml')
+    fusion.genDetectorFile(f_dir + '\\det.add.xml')
     genConfig(t_config,net,route)
     p_truth, truth = startTraciInstance(t_config)
     # load belief model (empty network)
@@ -87,5 +87,3 @@ def runSim(net,route,reroutes,fusion_arch=None):
 def compareStates(truth,belief):
     # compare state of belief to truth to acquire IQ metrics
     pass
-
-runSim('oneway_data\\oneway.net.xml', 'oneway_data\\oneway.rou.xml')
