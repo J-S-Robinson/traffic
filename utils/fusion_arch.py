@@ -51,6 +51,6 @@ class FusionArchitecture:
         with open(file, 'w+') as f:
             f.write('<additional>\n')
             for s in self.sensors:
-                f.write('   <inductionLoop id="%s" lane="%s" pos="%s" freq="%s"/\n>'
-                        % (s.id, s.lane, s.pos, s.frequency))
+                f.write('   <inductionLoop id="%s" lane="%s" pos="%s" freq="%s" file="out.xml"/>\n'
+                        % (s.id, s.lane, s.position, s.frequency))
             f.write('</additional>')

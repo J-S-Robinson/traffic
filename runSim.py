@@ -22,7 +22,7 @@ sim_globals = {'next_free_port': 8813}
 
 def startTraciInstance(cfg,begin = None, state_opt = None):
     # create args for running sumo on next available port
-    args = [sumo_path + '\\sumo.exe',
+    args = [sumo_path + '\\sumo-gui.exe',
             '-c', cfg,
             '--remote-port', str(sim_globals['next_free_port'])]
     if begin:
@@ -44,16 +44,16 @@ def startTraciInstance(cfg,begin = None, state_opt = None):
 
     
     
-def genConfig(cfg,net,route,add_args = None):
+def genConfig(cfg,net,route = None,add_args = None):
     args = [sumo_path + '\\sumo.exe',
             '--save-configuration', cfg,
-            '-n', net,
-            '-r', route]
-    args = list(map(str,args))
+            '-n', net]
+    if route:
+        args += ['-r', route]
     
     if add_args:
         args += add_args
-        
+    args = list(map(str,args))    
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     p.wait()
     print(p.stdout.read().decode())
@@ -64,26 +64,58 @@ def runSim(net,route,reroutes,fusion=None):
     
     # load truth model
     f_dir = os.path.split(net)[0]
+    net = os.path.split(net)[1]
+    route = os.path.split(route)[1]
     t_config = f_dir + '\\truth.sumocfg'
     
-    fusion.genDetectorFile(f_dir + '\\det.add.xml')
-    genConfig(t_config,net,route)
+    if fusion:
+        fusion.genDetectorFile(f_dir + '\\det.add.xml')
+    genConfig(t_config,net,route = route, add_args = ['--additional-files','det.add.xml'])
     p_truth, truth = startTraciInstance(t_config)
+    
     # load belief model (empty network)
+    b_config = f_dir + '\\belief.sumocfg'
+    genConfig(b_config,net)
+    p_belief, belief = startTraciInstance(b_config)
     
     # propagate truth and belief
     # while cars remain in the truth model
+    b_vehicles = []
     while truth.simulation.getMinExpectedNumber() > 0:
         truth.simulationStep()
-    
+        addSmartCars(truth,belief,b_vehicles,'smart')
+        belief.simulationStep()
+        input('Press <ENTER> to continue')
+
     # optional: create secondary tracks for dumb cars passing intersections
     
     # belief queries smart cars from truth
+    
     # belief receives sensor reports from truth via sensor model
     # fusion rules applied
     # belief state update
     # if it's time for a reroute, do so.
 
+def addSmartCars(t,b,b_list,vType):
+    for veh in t.vehicle.getIDList():
+        if t.vehicle.getTypeID(veh) == vType:
+            if veh not in b_list:
+                # add vehicle to network
+                # need route id for vehicle to create it
+                # get route of true vehicle
+                new_rou = t.vehicle.getRoute(veh)
+                if ('r_' + veh) not in b.route.getIDList():
+                    b.route.add('r_' + veh, new_rou)
+                print(t.vehicle.getPosition(veh))
+                print(t.vehicle.getSpeed(veh))
+                b.vehicle.addFull(veh,'r_' + veh,
+                                  depart = str(b.simulation.getCurrentTime()/1000),
+                                  departLane = str(t.vehicle.getLaneIndex(veh)),
+                                  departPos = str(t.vehicle.getPosition(veh)[1]),
+                                  departSpeed = str(t.vehicle.getSpeed(veh)))
+                b_list.append(veh)
+                print('added %s' % veh)
+                
 def compareStates(truth,belief):
     # compare state of belief to truth to acquire IQ metrics
     pass

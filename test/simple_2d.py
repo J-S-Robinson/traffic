@@ -57,9 +57,10 @@ def run():
     dem.genRouteFile('simple_2d\\2d.rou.xml')
     
     sensorList = []
-    sensorList.append(Fusion.Sensor('first', location, accuracy, p_d, fa=None, freq = 1):)
-    
+    lane = '1_2_0'
+    sensorList.append(Fusion.Sensor('first', 50, lane, .25, .95))
+    sensorList.append(Fusion.Sensor('second', 200, lane, .25, .95))
     fus = Fusion.FusionArchitecture(sensorList,None,None) 
     
     runSim.runSim('simple_2d\\2d.net.xml','simple_2d\\2d.rou.xml',
-           None,fusion=None)
+           None,fusion=fus)
