@@ -58,8 +58,8 @@ def run():
     
     sensorList = []
     lane = '1_2_0'
-    sensorList.append(Fusion.Sensor('first', 50, lane, .25, .95))
-    sensorList.append(Fusion.Sensor('second', 200, lane, .25, .95))
+    sensorList.append(Fusion.Sensor('first', 50, lane, [.25], .95))
+    sensorList.append(Fusion.Sensor('second', 200, lane, [.25], .95))
     fus = Fusion.FusionArchitecture(sensorList,None,None) 
     
     runSim.runSim('simple_2d\\2d.net.xml','simple_2d\\2d.rou.xml',

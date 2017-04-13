@@ -6,6 +6,7 @@ Created on Thu Apr  6 14:51:48 2017
 """
 
 import sys, subprocess, os
+from utils.fusion_arch import Sensor
 
 with open("local\\sumo.path", 'r') as f:
     sumo_path = f.read()
@@ -84,8 +85,10 @@ def runSim(net,route,reroutes,fusion=None):
     while truth.simulation.getMinExpectedNumber() > 0:
         truth.simulationStep()
         addSmartCars(truth,belief,b_vehicles,'smart')
+        if fusion.sensors:
+            senseDumbCars(truth,belief,b_vehicles,fusion)
         belief.simulationStep()
-        input('Press <ENTER> to continue')
+#        input('Press <ENTER> to continue')
 
     # optional: create secondary tracks for dumb cars passing intersections
     
@@ -115,6 +118,16 @@ def addSmartCars(t,b,b_list,vType):
                                   departSpeed = str(t.vehicle.getSpeed(veh)))
                 b_list.append(veh)
                 print('added %s' % veh)
+                
+def senseDumbCars(t,b,b_list,fus):
+    m = []
+    for sens in fus.sensors:
+        mm = sens.genMeasurements(t, Sensor.measure_T_and_V)
+        if mm:
+            m.append(mm)
+    if m:
+        print(m)
+    
                 
 def compareStates(truth,belief):
     # compare state of belief to truth to acquire IQ metrics

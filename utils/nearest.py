@@ -23,5 +23,4 @@ def associate_nn(self, belief, measures, gates, time):
             nearest_k = min(nearest, key=nearest.get)
             i['association'] = nearest_k
         else:
-            i['association'] = 'new'            
-        
+            i['association'] = 'new'

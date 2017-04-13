@@ -21,15 +21,29 @@ class Sensor:
     def genMeasurements(self, truth, measure):
         # truth is a traci instance of the true traffic state
         # measure is a function which retrieves the measured state from truth
-        m = measure(truth)
+        m = measure(self,truth)
         # remove some measurements based on probability of detection
-        m = [i for i in m if rand() < self.p_d]
-        # add Gaussian error to each component of each measurement
-        for i in m:
-            for j in i:
-                i[j] += self.accuracy[j] * gauss(0,1)
-                
-        
+        if m:
+            m = [i for i in m if rand() < self.p_d]
+            # add Gaussian error to each component of each measurement
+            for i in m:
+                i['time'] += self.accuracy[0] * gauss(0,1)
+                if i['speed'] and (len(self.accuracy) > 1):
+                    i['speed'] += self.accuracy[1] * gauss(0,1)
+        return m
+    
+    def measure_T_and_V(self,truth):
+        m = []
+        if truth.inductionloop.getLastStepVehicleNumber(self.id) > 0:
+            vd = truth.inductionloop.getVehicleData(self.id)
+            for v in vd:
+                mm = {}
+                mm['sensor'] = self.id
+                mm['lane'] = truth.inductionloop.getLaneID(self.id)
+                mm['time'] = v[2]
+                mm['speed'] = truth.inductionloop.getLastStepMeanSpeed(self.id)
+                m.append(mm)
+        return m
                 
 class Association:
     
