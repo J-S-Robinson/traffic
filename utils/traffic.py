@@ -35,6 +35,7 @@ class Vehicle:
                                   'depart':'%s' % self.departTime,
                                   'departLane': '%s' % self.departLane,
                                   'departSpeed': '%s' % self.departSpeed,
+                                  'departPos': 'last',
                                   'type':self.vType.ID})
         vehElem.append(self.route.get_XML_Element())
         return vehElem
